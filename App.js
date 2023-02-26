@@ -1,44 +1,53 @@
-import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StatusBar, StyleSheet, SafeAreaView, Text, View } from 'react-native';
-import { Searchbar } from 'react-native-paper';
+import { StatusBar as ExpoStatusBar } from "expo-status-bar";
+import React from "react";
+import { ThemeProvider } from "styled-components/native";
+import * as firebase from "firebase";
+
+import {
+  useFonts as useOswald,
+  Oswald_400Regular,
+} from "@expo-google-fonts/oswald";
+import { useFonts as useLato, Lato_400Regular } from "@expo-google-fonts/lato";
+
+import { theme } from "./src/infrastructure/theme";
+import { Navigation } from "./src/infrastructure/navigation";
+
+import { AuthenticationContextProvider } from "./src/services/authentication/authentication.context";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDdC1I6BQ7JCx4Bs4umyzbcGfn4BuKGJKU",
+  authDomain: "yummymeals-9ec5a.firebaseapp.com",
+  projectId: "yummymeals-9ec5a",
+  storageBucket: "yummymeals-9ec5a.appspot.com",
+  messagingSenderId: "226684331620",
+  appId: "1:226684331620:web:d4db213630972fed396171"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 export default function App() {
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [oswaldLoaded] = useOswald({
+    Oswald_400Regular,
+  });
 
-  const onChangeSearch = (query) => setSearchQuery(query);
+  const [latoLoaded] = useLato({
+    Lato_400Regular,
+  });
+
+  if (!oswaldLoaded || !latoLoaded) {
+    return null;
+  }
 
   return (
     <>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.search}>
-          <Searchbar
-            placeholder='Search'
-            onChangeText={onChangeSearch}
-            value={searchQuery}
-          />
-        </View>
-        <View style={styles.list}>
-          <Text>list</Text>
-        </View>
-      </SafeAreaView>
-      <ExpoStatusBar style='auto' />
+      <ThemeProvider theme={theme}>
+        <AuthenticationContextProvider>
+          <Navigation />
+        </AuthenticationContextProvider>
+      </ThemeProvider>
+      <ExpoStatusBar style="auto" />
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: StatusBar.currentHeight,
-  },
-  search: {
-    padding: 16,
-    backgroundColor: 'green',
-  },
-  list: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: 'blue',
-  },
-});
